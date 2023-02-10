@@ -1,0 +1,46 @@
+{
+  "name": "mirador-mosaic",
+  "type": "module",
+  "sourceType": "module",
+  "source": "src/mirador-mosaic.js",
+  "exports": {
+    "require": "./dist/mirador-mosaic.cjs",
+    "default": "./dist/mirador-mosaic.modern.js"
+  },
+  "main": "./dist/mirador-mosaic.cjs",
+  "module": "./dist/mirador-mosaic.module.js",
+  "unpkg": "./dist/mirador-mosaic.umd.js",
+  "scripts": {
+    "build": "microbundle",
+    "dev": "microbundle watch",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-react": "^7.18.6",
+    "@storybook/addon-actions": "^7.0.0-beta.45",
+    "@storybook/addon-essentials": "^7.0.0-beta.45",
+    "@storybook/addon-interactions": "^7.0.0-beta.45",
+    "@storybook/addon-links": "^7.0.0-beta.45",
+    "@storybook/react": "^7.0.0-beta.45",
+    "@storybook/react-webpack5": "^7.0.0-beta.45",
+    "@storybook/testing-library": "^0.0.14-next.1",
+    "@testing-library/react": "^13.4.0",
+    "babel-loader": "^8.3.0",
+    "microbundle": "^0.15.1",
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0",
+    "storybook": "next"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
+  },
+  "dependencies": {
+    "rdndmb-html5-to-touch": "^8.0.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-multi-backend": "^8.0.0"
+  }
+}
