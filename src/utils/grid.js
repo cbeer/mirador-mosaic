@@ -1,4 +1,11 @@
-export const removeEmptyGridRowCols = ({
+/**
+ * @typedef {Object} GridTemplate
+ * @property {number[]} rows row heights
+ * @property {number[]} columns column widths
+ * @property {string[][]} areas grid area assignments
+ */
+
+const removeEmptyGridRowCols = ({
   rows, columns, areas, ...other
 }) => ({
   rows: rows.filter((row) => row > 0),
@@ -7,7 +14,7 @@ export const removeEmptyGridRowCols = ({
   ...other,
 });
 
-export const cleanupRedundantRows = ({
+const cleanupRedundantRows = ({
   rows, columns, areas, ...other
 }) => {
   // select the rows that are the same as the row above them
@@ -22,7 +29,7 @@ export const cleanupRedundantRows = ({
   });
 };
 
-export const cleanupRedundantColumns = ({
+const cleanupRedundantColumns = ({
   rows, columns, areas, ...other
 }) => {
   const columnsToCompact = columns.map((_c, i) => {
@@ -44,7 +51,7 @@ export const cleanupRedundantColumns = ({
   });
 };
 
-export const cleanupPlaceholderColumns = ({
+const cleanupPlaceholderColumns = ({
   rows, columns, areas, ...other
 }) => {
   const columnsToRemove = columns.map((c, i) => (areas.every((row) => row[i] === '.') ? i : null)).filter((v) => v !== null);
@@ -59,7 +66,7 @@ export const cleanupPlaceholderColumns = ({
   });
 };
 
-export const cleanupPlaceholderRows = ({
+const cleanupPlaceholderRows = ({
   rows, columns, areas, ...other
 }) => {
   const rowsToRemove = rows.map((c, i) => (areas[i].every((v) => v === '.') ? i : null)).filter((v) => v !== null);
@@ -74,7 +81,7 @@ export const cleanupPlaceholderRows = ({
   });
 };
 
-export const calculateSpans = (areas) => {
+const calculateSpans = (areas) => {
   const spans = new Map();
 
   areas.forEach((row, i) => {
@@ -97,7 +104,7 @@ export const calculateSpans = (areas) => {
   return spans;
 };
 
-export const attemptBinPacking = ({
+const attemptBinPacking = ({
   rows, columns, areas, dir = 'left', ...other
 }) => {
   if (areas.reduce((sum, row) => sum + row.filter((v) => v === '.').length) === 0) return { rows, columns, areas };
@@ -162,7 +169,7 @@ export const attemptBinPacking = ({
   };
 };
 
-export const iterativeBinPacking = (grid) => {
+const iterativeBinPacking = (grid) => {
   const iterations = Math.max(grid.columns.length, grid.rows.length);
   return Array(iterations).fill(0).reduce((g) => attemptBinPacking(g), grid);
 };
@@ -180,6 +187,17 @@ export const cleanupGrid = (grid) => {
   return steps.reduce((g, step) => step(g) || grid, grid);
 };
 
+/**
+ * Insert a new column into the grid
+ *
+ * @param {GridTemplate} param0
+ * @param {Number} index
+ * @param {Number} size
+ * @param {Object} param3
+ * @param {String} param3.fill the value to fill the new column with
+ * @param {Boolean} param3.resize whether to resize the existing columns to preserve the overall proportions
+ * @returns
+ */
 export const insertColumn = ({
   rows, columns, areas, ...other
 }, index, size, { fill = undefined, resize = false } = {}) => {
@@ -189,24 +207,22 @@ export const insertColumn = ({
   return {
     rows,
     columns: [...columns.slice(0, index).map((i) => i * adj), size, ...columns.slice(index).map((i) => i * adj)],
-    areas: areas.map((row) => [...row.slice(0, index), fill || row[index], ...row.slice(index)]),
+    areas: areas.map((row) => [...row.slice(0, index), fill || row[Math.min(index, row.length - 1)], ...row.slice(index)]),
     ...other,
   };
 };
 
-export const splitColumn = (gridTemplate, index) => {
-  const {
-    rows, columns, areas, ...other
-  } = insertColumn(gridTemplate, index, gridTemplate.columns[index]);
-
-  return {
-    rows,
-    columns: [...columns.slice(0, index), columns[index] / 2, columns[index] / 2, ...columns.slice(index + 2)],
-    areas,
-    ...other,
-  };
-};
-
+/**
+ * Insert a new row into the grid
+ *
+ * @param {GridTemplate} param0
+ * @param {Number} index
+ * @param {Number} size
+ * @param {Object} param3
+ * @param {String} param3.fill the value to fill the new row with
+ * @param {Boolean} param3.resize whether to attempt to preserve the overall row proportions when inserting the new row
+ * @returns {GridTemplate}
+ */
 export const insertRow = ({
   rows, columns, areas, ...other
 }, index, size, { fill = undefined, resize = false } = {}) => {
@@ -216,24 +232,51 @@ export const insertRow = ({
   return {
     rows: [...rows.slice(0, index).map((i) => i * adj), size, ...rows.slice(index).map((i) => i * adj)],
     columns,
-    areas: [...areas.slice(0, index), fill || areas[index], ...areas.slice(index)],
+    areas: [...areas.slice(0, index), fill || areas[Math.min(index, rows.length - 1)], ...areas.slice(index)],
     ...other,
   };
 };
 
-export const splitRow = (gridTemplate, index) => {
-  const {
-    rows, columns, areas, ...other
-  } = insertRow(gridTemplate, index, gridTemplate.rows[index]);
+/**
+ *
+ * Split a row in half, copying data from the original row to the new row
+ *
+ * @param {GridTemplate} gridTemplate
+ * @param {*} index
+ * @returns {GridTemplate}
+ */
+export const splitRow = ({
+  rows, columns, areas, ...other
+}, index) => ({
+  rows: [...rows.slice(0, index), rows[index] / 2, rows[index] / 2, ...rows.slice(index + 1)],
+  columns,
+  areas: [...areas.slice(0, index), [...areas[index]], ...areas.slice(index)],
+  ...other,
+});
 
-  return {
-    rows: [...rows.slice(0, index), rows[index] / 2, rows[index] / 2, ...rows.slice(index + 2)],
-    columns,
-    areas,
-    ...other,
-  };
-};
+/**
+ *
+ * Split a column in half, copying data from the original column to the new column
+ *
+ * @param {GridTemplate} gridTemplate
+ * @param {*} index
+ * @returns {GridTemplate}
+ */
+export const splitColumn = ({
+  rows, columns, areas, ...other
+}, index) => ({
+  rows,
+  columns: [...columns.slice(0, index), columns[index] / 2, columns[index] / 2, ...columns.slice(index + 1)],
+  areas: areas.map((row) => [...row.slice(0, index), row[index], ...row.slice(index)]),
+  ...other,
+});
 
+/**
+ * Resize the columns using a function
+ * @param {GridTemplate} param0
+ * @param {*} func
+ * @returns {GridTemplate}
+ */
 export const resizeColumn = ({
   rows, columns, areas, ...other
 }, func) => ({
@@ -243,6 +286,12 @@ export const resizeColumn = ({
   ...other,
 });
 
+/**
+ * Resize the rows using a function
+ * @param {GridTemplate} param0
+ * @param {*} func
+ * @returns {GridTemplate}
+ */
 export const resizeRow = ({
   rows, columns, areas, ...other
 }, func) => ({
@@ -252,6 +301,17 @@ export const resizeRow = ({
   ...other,
 });
 
+/**
+ * Calculate the top/left/right/bottom bounds of a given grid item
+ *
+ * @param {GridTemplate} param0
+ * @param {String} id
+ * @returns {Object}
+ *   @property {Number} top
+ *   @property {Number} left
+ *   @property {Number} right
+ *   @property {Number} bottom
+ */
 export const getBounds = ({ areas }, id) => {
   const row = areas.find((r) => r.includes(id));
 
@@ -263,6 +323,10 @@ export const getBounds = ({ areas }, id) => {
   };
 };
 
+/**
+ * Create a new grid layout with one column per child
+ * @returns {GridTemplate}
+ */
 export const calculateDefaultLayout = (children) => (
   { rows: [1], columns: Array(children.length).fill(1), areas: [children] }
 );
