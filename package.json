@@ -3,6 +3,7 @@
   "type": "module",
   "sourceType": "module",
   "source": "src/mirador-mosaic.js",
+  "homepage": "https://cbeer.github.io/mirador-mosaic",
   "exports": {
     "require": "./dist/mirador-mosaic.cjs",
     "default": "./dist/mirador-mosaic.modern.js"
@@ -14,7 +15,9 @@
     "build": "microbundle",
     "dev": "microbundle watch",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "predeploy": "npm run build-storybook",
+    "deploy-storybook": "gh-pages -d storybook-static"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
@@ -29,6 +32,7 @@
     "@storybook/testing-library": "^0.0.14-next.1",
     "@testing-library/react": "^13.4.0",
     "babel-loader": "^8.3.0",
+    "gh-pages": "^5.0.0",
     "microbundle": "^0.15.1",
     "react": "^16.8.0",
     "react-dom": "^16.8.0",
