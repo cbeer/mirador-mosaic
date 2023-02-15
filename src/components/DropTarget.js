@@ -1,6 +1,12 @@
 import PropTypes from 'prop-types';
 import { useDrop } from 'react-dnd';
 
+/**
+ * Specific drop area within a window; handles drop events and
+ *   makes the drop area metadata ("dir") available to the
+ *   upstream drop handler
+ * @private
+ */
 function DropTarget({
   box, dir = 'left', size = '30%', style = {}, ...props
 }) {
@@ -46,6 +52,10 @@ DropTarget.propTypes = {
   style: PropTypes.object,
 };
 
+/**
+ * Container for the various drop targets (top, bottom, left, right)
+ * within a window.
+ */
 function DropTargetContainer({
   isOver = false, padding = 0, size = '30%', style, ...props
 }) {
