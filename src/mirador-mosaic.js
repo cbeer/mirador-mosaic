@@ -1,5 +1,7 @@
 import Grid from './components/Grid';
-import { GridContext } from './context/GridContext';
+import { GridContext, GridDispatchContext } from './context/GridProvider';
 import * as gridUtils from './utils/grid';
 
-export { Grid, GridContext, gridUtils }; // eslint-disable-line import/prefer-default-export
+export {
+  Grid, GridContext, GridDispatchContext, gridUtils,
+}; // eslint-disable-line import/prefer-default-export
