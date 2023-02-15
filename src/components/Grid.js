@@ -11,7 +11,7 @@ import Tile from './Tile';
 import * as grid from '../utils/grid';
 
 const calculateGridStyles = (gridTemplate) => ({
-  gridTemplateRows: (gridTemplate.rows.map((row) => `${row}fr`).concat(['0px'])).join(' '),
+  gridTemplateRows: (gridTemplate.rows.map((row) => `${row}fr`)).join(' '),
   gridTemplateColumns: gridTemplate.columns.map((col) => `minmax(max-content, ${col}fr)`).join(' '),
   gridTemplateAreas: gridTemplate.areas.map((row) => `"${row.join(' ')}"`).join('\n'),
   gridAutoRows: '0px',
