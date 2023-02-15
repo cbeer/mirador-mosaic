@@ -1,5 +1,5 @@
 import {
-  Children, useCallback, useLayoutEffect, useState, useRef,
+  Children, useCallback, useLayoutEffect, useState, useRef, useMemo,
 } from 'react';
 import PropTypes from 'prop-types';
 import { DndProvider } from 'react-dnd-multi-backend';
@@ -9,6 +9,7 @@ import mergeRefs from '../utils/mergeRefs';
 import DropTargetContainer from './DropTarget';
 import Tile from './Tile';
 import * as grid from '../utils/grid';
+import { GridContext } from '../context/GridContext';
 
 const calculateGridStyles = (gridTemplate) => ({
   gridTemplateRows: (gridTemplate.rows.map((row) => `${row}fr`)).join(' '),
@@ -59,7 +60,7 @@ function Container({
   const ref = useRef(null);
   const chArray = Children.toArray(children);
   const [gridTemplate, setGridTemplate] = useState(grid.cleanupGrid(initialLayout || grid.calculateDefaultLayout(chArray.map((c) => c.props.id))));
-  const [temporaryGridTemplate, setTemporaryGridTemplate] = useState(gridTemplate);
+  const [temporaryGridTemplate, setTemporaryGridTemplate] = useState(null);
 
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
@@ -185,18 +186,7 @@ function Container({
       return undefined;
     },
     hover({ id }) {
-      // split the current column and divide it before/after
-      const newAreas = gridTemplate.areas.map((row) => {
-        const adjRow = row.map((v) => {
-          if (v === id) {
-            return '.';
-          }
-          return v;
-        });
-        return adjRow;
-      });
-
-      setTemporaryGridTemplate(grid.cleanupGrid({ ...gridTemplate, areas: newAreas }));
+      setTemporaryGridTemplate(grid.cleanupGrid(grid.removeBox(gridTemplate, id)));
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
@@ -214,11 +204,20 @@ function Container({
     setHeight(ref.current.getBoundingClientRect().height);
   }, []);
 
+  const gridContext = useMemo(() => (
+    {
+      gridTemplate,
+      setGridTemplate: (g) => setGridTemplate(grid.cleanupGrid(g)),
+    }
+  ), [gridTemplate, setGridTemplate]);
+
   return (
-    <div ref={mergeRefs(ref, windowDrop, borderDrop)} style={gridStyle} {...props}>
-      <DropTargetContainer isOver={isOver} box="root" size="25px" />
-      {Children.map(children, (child) => <Tile id={child.props.id} onDropFailed={onDropFailed}>{child}</Tile>)}
-    </div>
+    <GridContext.Provider value={gridContext}>
+      <div ref={mergeRefs(ref, windowDrop, borderDrop)} style={gridStyle} {...props}>
+        <DropTargetContainer isOver={isOver} box="root" size="25px" />
+        {Children.map(children, (child) => <Tile id={child.props.id} onDropFailed={onDropFailed}>{child}</Tile>)}
+      </div>
+    </GridContext.Provider>
   );
 }
 

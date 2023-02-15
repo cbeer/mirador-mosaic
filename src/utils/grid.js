@@ -330,3 +330,18 @@ export const getBounds = ({ areas }, id) => {
 export const calculateDefaultLayout = (children) => (
   { rows: [1], columns: Array(children.length).fill(1), areas: [children] }
 );
+
+export const removeBox = (grid, id) => (
+  {
+    ...grid,
+    areas: grid.areas.map((row) => {
+      const adjRow = row.map((v) => {
+        if (v === id) {
+          return '.';
+        }
+        return v;
+      });
+      return adjRow;
+    }),
+  }
+);

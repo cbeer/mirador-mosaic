@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Grid } from '../mirador-mosaic';
+import { Grid, GridContext, gridUtils } from '../mirador-mosaic';
 
 export default {
   title: 'Grid',
@@ -8,10 +8,13 @@ export default {
 };
 
 const Window = ({children, dragHandle = undefined, style, ...props}) => {
+  const grid = React.useContext(GridContext);
+
   return (
     <div {...props} style={{ height: '100%', border: '1px solid rgba(0,0,0,0.3)', ...style}}>
       <div ref={dragHandle} style={{backgroundColor: 'rgba(0,0,0,0.3)', cursor: 'pointer'}}>
         Drag handle
+        <button onClick={() => { grid.setGridTemplate(gridUtils.removeBox(grid.gridTemplate, props.id))}}>x</button>
       </div>
       {children}
     </div>
