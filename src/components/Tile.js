@@ -2,39 +2,7 @@ import { cloneElement } from 'react';
 import PropTypes from 'prop-types';
 import { useDrag, useDrop } from 'react-dnd';
 import DropTargetContainer from './DropTarget';
-
-function DragHandle({
-  box, dir, style,
-}) {
-  const [{}, drag, preview] = useDrag(() => ({
-    type: 'mirador.handle',
-    item: { box, dir },
-    collect: (monitor) => ({
-    }),
-  }), []);
-
-  const handleStyles = {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    position: 'absolute',
-  };
-
-  return (
-    <div ref={preview} style={{ ...handleStyles, ...style, opacity: 0 }}>
-      <div
-        ref={drag}
-        style={{
-          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0,
-        }}
-      />
-    </div>
-  );
-}
-
-DragHandle.propTypes = {
-  box: PropTypes.string,
-  dir: PropTypes.string,
-  style: PropTypes.object,
-};
+import DragHandles from './DragHandles';
 
 function Tile({
   children, id, onDropFailed = () => {}, gridArea = id,
@@ -88,7 +56,7 @@ function Tile({
         {cloneElement(children, { dragHandle })}
       </div>
 
-      <ResizeControls box={id} />
+      <DragHandles box={id} />
     </div>
   );
 }
@@ -99,40 +67,5 @@ Tile.propTypes = {
   onDropFailed: PropTypes.func,
   gridArea: PropTypes.string,
 };
-
-function ResizeControls(props) {
-  return (
-    <>
-      <DragHandle
-        {...props}
-        dir="left"
-        style={{
-          left: -2, width: 5, top: 0, bottom: 0, cursor: 'ew-resize',
-        }}
-      />
-      <DragHandle
-        {...props}
-        dir="top"
-        style={{
-          top: -2, height: 5, left: 0, right: 0, cursor: 'ns-resize',
-        }}
-      />
-      <DragHandle
-        {...props}
-        dir="right"
-        style={{
-          right: -2, width: 5, top: 0, bottom: 0, cursor: 'ew-resize',
-        }}
-      />
-      <DragHandle
-        {...props}
-        dir="bottom"
-        style={{
-          bottom: -2, height: 5, left: 0, right: 0, cursor: 'ns-resize',
-        }}
-      />
-    </>
-  );
-}
 
 export default Tile;
