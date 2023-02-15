@@ -1,4 +1,4 @@
-import { cloneElement } from 'react';
+import { cloneElement, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useDrag, useDrop } from 'react-dnd';
 import DropTargetContainer from './DropTarget';
@@ -48,12 +48,14 @@ function Tile({
     height: '100%',
   };
 
+  const child = useMemo(() => cloneElement(children, { dragHandle }), [children, dragHandle]);
+
   return (
     <div ref={drop} style={tileStyle}>
       <DropTargetContainer isOver={isOver} box={id} padding={4} />
 
       <div ref={preview} style={windowStyle}>
-        {cloneElement(children, { dragHandle })}
+        {child}
       </div>
 
       <DragHandles box={id} />
