@@ -17,7 +17,9 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "predeploy": "npm run build-storybook",
-    "deploy-storybook": "gh-pages -d storybook-static"
+    "deploy-storybook": "gh-pages -d storybook-static",
+    "lint": "eslint src",
+    "test": "jest"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
@@ -39,6 +41,7 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "gh-pages": "^5.0.0",
+    "jest": "^29.4.3",
     "microbundle": "^0.15.1",
     "react": "^16.8.0",
     "react-dom": "^16.8.0",
