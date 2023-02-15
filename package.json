@@ -32,6 +32,12 @@
     "@storybook/testing-library": "^0.0.14-next.1",
     "@testing-library/react": "^13.4.0",
     "babel-loader": "^8.3.0",
+    "eslint": "^7.32.0 || ^8.2.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
     "gh-pages": "^5.0.0",
     "microbundle": "^0.15.1",
     "react": "^16.8.0",
@@ -43,6 +49,7 @@
     "react-dom": "^16.8.0"
   },
   "dependencies": {
+    "prop-types": "^15.8.1",
     "rdndmb-html5-to-touch": "^8.0.0",
     "react-dnd": "^16.0.1",
     "react-dnd-multi-backend": "^8.0.0"
