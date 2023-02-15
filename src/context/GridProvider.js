@@ -118,7 +118,7 @@ const gridReducer = (state, action) => {
 
         result = operations.resizeColumn(
           operations.insertColumn(state, bounds[dir] + colToDuplicate, Math.abs(size), { source: id }),
-          (v, i) => (i === colToUpdate ? Math.max(0, v - Math.abs(size)) : v),
+          (v, i) => (i === colToUpdate ? Math.max(0.01, v - Math.abs(size)) : v),
         );
       } if (dir === 'top' || dir === 'bottom') {
         const [rowToDuplicate, rowToStealSizeFrom] = size > 0 ? blah[dir] : blah[dir].reverse();
@@ -126,7 +126,7 @@ const gridReducer = (state, action) => {
 
         result = operations.resizeRow(
           operations.insertRow(state, bounds[dir] + rowToDuplicate, Math.abs(size), { source: id }),
-          (v, i) => (i === rowToUpdate ? Math.max(0, v - Math.abs(size)) : v),
+          (v, i) => (i === rowToUpdate ? Math.max(0.01, v - Math.abs(size)) : v),
         );
       }
 

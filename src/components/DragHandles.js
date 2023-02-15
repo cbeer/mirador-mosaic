@@ -1,9 +1,26 @@
+import {
+  useState, useContext,
+} from 'react';
 import PropTypes from 'prop-types';
 import { useDrag } from 'react-dnd';
+import { GridContext, GridDispatchContext } from '../context/GridProvider';
+import { getBounds } from '../utils/grid';
 
 function DragHandle({
   box, dir, style,
 }) {
+  const grid = useContext(GridContext);
+  const dispatch = useContext(GridDispatchContext);
+
+  const bounds = getBounds(grid, box);
+  const { rows, columns } = grid;
+
+  if (dir === 'top' && bounds.top === 0) return null;
+  if (dir === 'bottom' && bounds.bottom === rows.length - 1) return null;
+  if (dir === 'left' && bounds.left === 0) return null;
+  if (dir === 'right' && bounds.right === columns.length - 1) return null;
+
+  const [hasFocus, setFocus] = useState(false);
   const [{}, drag, preview] = useDrag(() => ({ // eslint-disable-line no-empty-pattern
     type: 'mirador.handle',
     item: { box, dir },
@@ -12,10 +29,87 @@ function DragHandle({
   const handleStyles = {
     backgroundColor: 'rgba(0,0,0,0.5)',
     position: 'absolute',
+    opacity: 0,
+    ...(hasFocus && { backgroundColor: 'rgba(0,0,0,0.8)', opacity: 0.5, transition: 'opacity 0.2s ease-in-out' }),
+  };
+
+  const onKeyDown = ({ key }) => {
+    switch (key) {
+      case 'Down':
+      case 'ArrowDown':
+        if (dir === 'bottom') {
+          dispatch({
+            type: 'resize', final: true, id: box, dir, value: { bottom: 0.05 },
+          });
+        } else if (dir === 'top') {
+          dispatch({
+            type: 'resize', final: true, id: box, dir, value: { top: 0.05 },
+          });
+        }
+        break;
+      case 'Up':
+      case 'ArrowUp':
+        if (dir === 'bottom') {
+          dispatch({
+            type: 'resize', final: true, id: box, dir, value: { bottom: -0.05 },
+          });
+        } else if (dir === 'top') {
+          dispatch({
+            type: 'resize', final: true, id: box, dir, value: { top: -0.05 },
+          });
+        }
+        break;
+      case 'Left':
+      case 'ArrowLeft':
+        if (dir === 'left') {
+          dispatch({
+            type: 'resize', final: true, id: box, dir, value: { left: -0.05 },
+          });
+        } else if (dir === 'right') {
+          dispatch({
+            type: 'resize', final: true, id: box, dir, value: { right: -0.05 },
+          });
+        }
+        break;
+      case 'Right':
+      case 'ArrowRight':
+        if (dir === 'left') {
+          dispatch({
+            type: 'resize', final: true, id: box, dir, value: { left: 0.05 },
+          });
+        } else if (dir === 'right') {
+          dispatch({
+            type: 'resize', final: true, id: box, dir, value: { right: 0.05 },
+          });
+        }
+        break;
+      case 'Home':
+        dispatch({
+          type: 'resize', final: true, id: box, dir, value: { [dir]: -1 },
+        });
+        break;
+      case 'End':
+        dispatch({
+          type: 'resize', final: true, id: box, dir, value: { [dir]: 1 },
+        });
+        break;
+      default:
+        break;
+    }
   };
 
   return (
-    <div ref={preview} style={{ ...handleStyles, ...style, opacity: 0 }}>
+    <div // eslint-disable-line jsx-a11y/no-noninteractive-element-interactions
+      ref={preview}
+      role="separator"
+      onKeyDown={onKeyDown}
+      onFocus={() => setFocus(true)}
+      onBlur={() => setFocus(false)}
+      onDragStart={() => setFocus(false)}
+      onDragEnd={() => setFocus(true)}
+      tabIndex={0} // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
+      style={{ ...handleStyles, ...style }}
+    >
       <div
         ref={drag}
         style={{

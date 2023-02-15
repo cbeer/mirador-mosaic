@@ -57,7 +57,7 @@ const cleanupPlaceholderColumns = ({
   const columnsToRemove = columns.map((c, i) => (areas.every((row) => row[i] === '.') ? i : null)).filter((v) => v !== null);
   const newColumns = columns.filter((v, i) => !columnsToRemove.includes(i));
 
-  const adj = columns.reduce((a, b) => a + b) / newColumns.reduce((a, b) => a + b);
+  const adj = columns.reduce((a, b) => a + b, 0) / newColumns.reduce((a, b) => a + b, 0);
   return ({
     rows,
     columns: newColumns.map((c) => c * adj),
@@ -72,7 +72,7 @@ const cleanupPlaceholderRows = ({
   const rowsToRemove = rows.map((c, i) => (areas[i].every((v) => v === '.') ? i : null)).filter((v) => v !== null);
   const newRows = rows.filter((v, i) => !rowsToRemove.includes(i));
 
-  const adj = rows.reduce((a, b) => a + b) / newRows.reduce((a, b) => a + b);
+  const adj = rows.reduce((a, b) => a + b, 0) / newRows.reduce((a, b) => a + b, 0);
   return ({
     rows: newRows.map((c) => c * adj),
     columns,
@@ -313,7 +313,7 @@ export const resizeRow = ({
  *   @property {Number} bottom
  */
 export const getBounds = ({ areas }, id) => {
-  const row = areas.find((r) => r.includes(id));
+  const row = areas.find((r) => r.includes(id)) || [];
 
   return {
     right: row.lastIndexOf(id),
