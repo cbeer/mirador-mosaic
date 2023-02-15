@@ -20,7 +20,7 @@ function DropTarget({
         dropAreaStyles: (
           monitor.getItem()?.id !== box
             && monitor.isOver()
-            && monitor.canDrop() ? { backgroundColor: 'rgba(255, 0,0,0.7)' } : {}
+            && monitor.canDrop() ? { backgroundColor: 'rgba(0,0,0,0.3)', border: '2px solid #000' } : {}
         ),
       }),
     }),

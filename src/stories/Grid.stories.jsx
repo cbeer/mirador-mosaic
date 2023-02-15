@@ -12,7 +12,7 @@ const Window = ({ id, children, dragHandle = undefined, style, ...props}) => {
 
   return (
     <div id={id} {...props} style={{ height: '100%', border: '1px solid rgba(0,0,0,0.3)', ...style}}>
-      <div ref={dragHandle} style={{backgroundColor: 'rgba(0,0,0,0.3)', cursor: 'pointer'}}>
+      <div ref={dragHandle} style={{backgroundColor: 'rgba(0,0,0,0.3)', cursor: 'move'}}>
         Drag handle
         <button onClick={() => { dispatch({ type: 'remove', id })}}>x</button>
       </div>
