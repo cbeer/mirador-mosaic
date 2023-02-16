@@ -5,14 +5,47 @@
  * @property {string[][]} areas grid area assignments
  */
 
+/**
+ * Get the list of area names from a grid template
+ *
+ * @param {GridTemplate}
+ */
+export const getAreaNames = ({ areas }) => {
+  const names = new Set();
+
+  areas.forEach((row) => {
+    row.forEach((name) => {
+      if (name !== '.') {
+        names.add(name);
+      }
+    });
+  });
+
+  return names;
+};
+
 const removeEmptyGridRowCols = ({
   rows, columns, areas, ...other
-}) => ({
-  rows: rows.filter((row) => row > 0),
-  columns: columns.filter((col) => col > 0),
-  areas: areas.filter((row, i) => rows[i] > 0).map((r) => r.filter((v, i) => columns[i] > 0)),
-  ...other,
-});
+}) => {
+  const newAreas = areas.filter((row, i) => rows[i] > 0).map((r) => r.filter((v, i) => columns[i] > 0));
+
+  const before = Array.from(getAreaNames({ areas }));
+  const after = getAreaNames({ areas: newAreas });
+
+  // as long as we have the same elements, the empty rows/cols are redundant
+  if (before.every((item) => after.has(item))) {
+    return {
+      rows: rows.filter((row) => row > 0),
+      columns: columns.filter((col) => col > 0),
+      areas: newAreas,
+      ...other,
+    };
+  }
+
+  return {
+    rows, columns, areas, ...other,
+  };
+};
 
 const cleanupRedundantRows = ({
   rows, columns, areas, ...other
@@ -329,20 +362,6 @@ export const getBounds = ({ areas }, id) => {
     top: areas.findIndex((r) => r.includes(id)),
     bottom: areas.findLastIndex((r) => r.includes(id)),
   };
-};
-
-export const getAreaNames = ({ areas }) => {
-  const names = new Set();
-
-  areas.forEach((row) => {
-    row.forEach((name) => {
-      if (name !== '.') {
-        names.add(name);
-      }
-    });
-  });
-
-  return Array.from(names);
 };
 
 /**

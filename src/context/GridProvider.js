@@ -11,8 +11,8 @@ const gridReducer = (state, action) => {
   switch (action.type) {
     case 'update_windows': {
       const layoutAreaNames = operations.getAreaNames(state);
-      const added = action.childIds.filter((id) => !layoutAreaNames.includes(id));
-      const removed = layoutAreaNames.filter((id) => !action.childIds.includes(id));
+      const added = action.childIds.filter((id) => !layoutAreaNames.has(id));
+      const removed = Array.from(layoutAreaNames).filter((id) => !action.childIds.includes(id));
 
       if (added.length === 0 && removed.length === 0) return state;
 
@@ -137,7 +137,7 @@ const gridReducer = (state, action) => {
 
         result = operations.resizeColumn(
           operations.insertColumn(state, bounds[dir] + colToDuplicate, Math.abs(size), { source: id }),
-          (v, i) => (i === colToUpdate ? Math.max(0.01, v - Math.abs(size)) : v),
+          (v, i) => (i === colToUpdate ? Math.max(0, v - Math.abs(size)) : v),
         );
       } if (dir === 'top' || dir === 'bottom') {
         const [rowToDuplicate, rowToStealSizeFrom] = size > 0 ? blah[dir] : blah[dir].reverse();
@@ -145,7 +145,7 @@ const gridReducer = (state, action) => {
 
         result = operations.resizeRow(
           operations.insertRow(state, bounds[dir] + rowToDuplicate, Math.abs(size), { source: id }),
-          (v, i) => (i === rowToUpdate ? Math.max(0.01, v - Math.abs(size)) : v),
+          (v, i) => (i === rowToUpdate ? Math.max(0, v - Math.abs(size)) : v),
         );
       }
 
