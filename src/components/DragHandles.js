@@ -11,6 +11,12 @@ function DragHandle({
 }) {
   const grid = useContext(GridContext);
   const dispatch = useContext(GridDispatchContext);
+  const [hasFocus, setFocus] = useState(false);
+
+  const [{}, drag, preview] = useDrag(() => ({ // eslint-disable-line no-empty-pattern
+    type: 'mirador.handle',
+    item: { box, dir },
+  }), []);
 
   const bounds = getBounds(grid, box);
   const { rows, columns } = grid;
@@ -19,12 +25,6 @@ function DragHandle({
   if (dir === 'bottom' && bounds.bottom === rows.length - 1) return null;
   if (dir === 'left' && bounds.left === 0) return null;
   if (dir === 'right' && bounds.right === columns.length - 1) return null;
-
-  const [hasFocus, setFocus] = useState(false);
-  const [{}, drag, preview] = useDrag(() => ({ // eslint-disable-line no-empty-pattern
-    type: 'mirador.handle',
-    item: { box, dir },
-  }), []);
 
   const handleStyles = {
     backgroundColor: 'rgba(0,0,0,0.5)',
