@@ -33,17 +33,19 @@ function DragHandle({
     ...(hasFocus && { backgroundColor: 'rgba(0,0,0,0.8)', opacity: 0.5, transition: 'opacity 0.2s ease-in-out' }),
   };
 
-  const onKeyDown = ({ key }) => {
+  const onKeyDown = ({ shiftKey, key }) => {
+    const size = shiftKey ? 0.001 : 0.05;
+
     switch (key) {
       case 'Down':
       case 'ArrowDown':
         if (dir === 'bottom') {
           dispatch({
-            type: 'resize', final: true, id: box, dir, value: { bottom: 0.05 },
+            type: 'resize', final: true, id: box, dir, value: { bottom: size },
           });
         } else if (dir === 'top') {
           dispatch({
-            type: 'resize', final: true, id: box, dir, value: { top: 0.05 },
+            type: 'resize', final: true, id: box, dir, value: { top: size },
           });
         }
         break;
@@ -51,11 +53,11 @@ function DragHandle({
       case 'ArrowUp':
         if (dir === 'bottom') {
           dispatch({
-            type: 'resize', final: true, id: box, dir, value: { bottom: -0.05 },
+            type: 'resize', final: true, id: box, dir, value: { bottom: -1 * size },
           });
         } else if (dir === 'top') {
           dispatch({
-            type: 'resize', final: true, id: box, dir, value: { top: -0.05 },
+            type: 'resize', final: true, id: box, dir, value: { top: -1 * size },
           });
         }
         break;
@@ -63,11 +65,11 @@ function DragHandle({
       case 'ArrowLeft':
         if (dir === 'left') {
           dispatch({
-            type: 'resize', final: true, id: box, dir, value: { left: -0.05 },
+            type: 'resize', final: true, id: box, dir, value: { left: -1 * size },
           });
         } else if (dir === 'right') {
           dispatch({
-            type: 'resize', final: true, id: box, dir, value: { right: -0.05 },
+            type: 'resize', final: true, id: box, dir, value: { right: -1 * size },
           });
         }
         break;
@@ -75,11 +77,11 @@ function DragHandle({
       case 'ArrowRight':
         if (dir === 'left') {
           dispatch({
-            type: 'resize', final: true, id: box, dir, value: { left: 0.05 },
+            type: 'resize', final: true, id: box, dir, value: { left: size },
           });
         } else if (dir === 'right') {
           dispatch({
-            type: 'resize', final: true, id: box, dir, value: { right: 0.05 },
+            type: 'resize', final: true, id: box, dir, value: { right: size },
           });
         }
         break;
