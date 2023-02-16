@@ -96,7 +96,7 @@ const gridReducer = (state, action) => {
         });
 
         result = {
-          ...state, rows, columns, areas: newAreas,
+          ...state, rows, columns, areas: newAreas, dir,
         };
       }
 
