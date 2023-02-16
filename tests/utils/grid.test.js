@@ -316,36 +316,23 @@ test('cleanupGrid', () => {
     },
   );
 
-  const emptyCells = [
-    ['a', 'b', 'c'],
-    ['d', '.', '.'],
-    ['e', '.', '.'],
-    ['e', 'f', 'f'],
-  ];
-
-  expect(grid.cleanupGrid({ ...layout, areas: emptyCells, dir: 'left' })).toEqual(
+  expect(grid.cleanupGrid({
+    rows: [1, 1], columns: [1, 1], areas: [['a', 'b'], ['.', 'c']], dir: 'left',
+  })).toEqual(
     {
-      rows: [1, 1, 1, 1],
-      columns: [1, 1, 1],
-      areas: [
-        ['a', 'b', 'c'],
-        ['d', 'b', 'c'],
-        ['e', 'b', 'c'],
-        ['e', 'f', 'f'],
-      ],
+      rows: [1, 1],
+      columns: [1, 1],
+      areas: [['a', 'b'], ['c', 'c']],
     },
   );
 
-  expect(grid.cleanupGrid({ ...layout, areas: emptyCells, dir: 'top' })).toEqual(
+  expect(grid.cleanupGrid({
+    rows: [1, 1], columns: [1, 1], areas: [['a', 'b'], ['.', 'c']], dir: 'top',
+  })).toEqual(
     {
-      rows: [1, 1, 1, 1],
-      columns: [1, 1, 1],
-      areas: [
-        ['a', 'b', 'c'],
-        ['d', 'b', 'c'],
-        ['e', 'b', 'c'],
-        ['e', 'f', 'f'],
-      ],
+      rows: [1, 1],
+      columns: [1, 1],
+      areas: [['a', 'b'], ['a', 'c']],
     },
   );
 });
