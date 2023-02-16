@@ -1,5 +1,5 @@
 import {
-  useReducer, createContext, useContext,
+  useReducer, createContext, useContext, useEffect,
 } from 'react';
 import PropTypes from 'prop-types';
 import * as operations from '../utils/grid';
@@ -9,8 +9,27 @@ export const GridDispatchContext = createContext(undefined);
 
 const gridReducer = (state, action) => {
   switch (action.type) {
+    case 'update_windows': {
+      const layoutAreaNames = operations.getAreaNames(state);
+      const added = action.childIds.filter((id) => !layoutAreaNames.includes(id));
+      const removed = layoutAreaNames.filter((id) => !action.childIds.includes(id));
+
+      if (added.length === 0 && removed.length === 0) return state;
+
+      const { columns } = state;
+
+      const newSize = Math.max(1, columns.reduce((a, b) => a + b, 0) / Math.max(columns.length, 1));
+
+      const newState = added.reduce((acc, id) => operations.insertColumn(acc, columns.length, newSize, { fill: id }), state);
+      return operations.cleanupGrid(operations.filter(newState, (v) => removed.includes(v)));
+    }
     case 'remove': {
       return operations.cleanupGrid(operations.removeBox(state, action.id));
+    }
+    case 'add': {
+      const { columns } = state;
+      const newSize = Math.min(1, columns.reduce((a, b) => a + b, 0) / columns.length);
+      return operations.insertColumn(state, columns.length, newSize, { fill: action.id });
     }
     case 'set': {
       return operations.cleanupGrid(action.layout);
@@ -106,8 +125,8 @@ const gridReducer = (state, action) => {
         bottom: [0, 1],
       };
 
-      const widthFrs = columns.reduce((a, b) => a + b);
-      const heightFrs = rows.reduce((a, b) => a + b);
+      const widthFrs = columns.reduce((a, b) => a + b, 0);
+      const heightFrs = rows.reduce((a, b) => a + b, 0);
 
       let result;
       const size = (dir === 'right' || dir === 'left') ? value[dir] * widthFrs : value[dir] * heightFrs;
@@ -142,14 +161,21 @@ const gridReducer = (state, action) => {
 };
 
 export function GridProvider({ children, childIds, value }) {
-  const [gridTemplate, dispatcher] = useReducer(gridReducer, value, (l) => operations.cleanupGrid(l || operations.calculateDefaultLayout(childIds)));
+  const upstreamContext = useContext(GridContext);
+  const upstreamDispatch = useContext(GridDispatchContext);
+  const [gridTemplate, dispatch] = useReducer(gridReducer, value, (l) => operations.cleanupGrid(l || operations.calculateDefaultLayout(childIds)));
 
-  const context = useContext(GridContext);
-  if (context) return children;
+  useEffect(() => {
+    const dispatchFn = upstreamDispatch || dispatch;
+
+    dispatchFn({ type: 'update_windows', childIds });
+  }, [childIds]);
+
+  if (upstreamContext) return children;
 
   return (
     <GridContext.Provider value={gridTemplate}>
-      <GridDispatchContext.Provider value={dispatcher}>
+      <GridDispatchContext.Provider value={dispatch}>
         {children}
       </GridDispatchContext.Provider>
     </GridContext.Provider>

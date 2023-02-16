@@ -201,8 +201,16 @@ export const cleanupGrid = (grid) => {
 export const insertColumn = ({
   rows, columns, areas, ...other
 }, index, size, { fill = undefined, resize = false } = {}) => {
-  const colSize = columns.reduce((a, b) => a + b);
+  const colSize = columns.reduce((a, b) => a + b, 0);
   const adj = resize ? 1 - (size / colSize) : 1;
+
+  if (rows.length === 0 && columns.length === 0) {
+    return {
+      rows: [1],
+      columns: [1],
+      areas: [[fill || '.']],
+    };
+  }
 
   return {
     rows,
@@ -226,7 +234,7 @@ export const insertColumn = ({
 export const insertRow = ({
   rows, columns, areas, ...other
 }, index, size, { fill = undefined, resize = false } = {}) => {
-  const rowSize = rows.reduce((a, b) => a + b);
+  const rowSize = rows.reduce((a, b) => a + b, 0);
   const adj = resize && size !== rowSize ? 1 - (size / rowSize) : 1;
 
   return {
@@ -323,6 +331,20 @@ export const getBounds = ({ areas }, id) => {
   };
 };
 
+export const getAreaNames = ({ areas }) => {
+  const names = new Set();
+
+  areas.forEach((row) => {
+    row.forEach((name) => {
+      if (name !== '.') {
+        names.add(name);
+      }
+    });
+  });
+
+  return Array.from(names);
+};
+
 /**
  * Create a new grid layout with one column per child
  * @returns {GridTemplate}
@@ -337,6 +359,21 @@ export const removeBox = (grid, id) => (
     areas: grid.areas.map((row) => {
       const adjRow = row.map((v) => {
         if (v === id) {
+          return '.';
+        }
+        return v;
+      });
+      return adjRow;
+    }),
+  }
+);
+
+export const filter = (grid, fn = () => {}) => (
+  {
+    ...grid,
+    areas: grid.areas.map((row) => {
+      const adjRow = row.map((v) => {
+        if (fn(v)) {
           return '.';
         }
         return v;

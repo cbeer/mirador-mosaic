@@ -20,6 +20,13 @@ const Window = ({ id, children, dragHandle = undefined, style, ...props}) => {
     </div>
   )
 }
+const intToPlaceholder = (i) => String.fromCharCode(65 + i);
+
+const Template = ({ howManyWindows = 0, args }) => <Grid {...args}>{Array(howManyWindows).fill().map((v, i) => <Window key={i} id={intToPlaceholder(i)}>{intToPlaceholder(i)}</Window>)}</Grid>;
+export const Primary = Template.bind({});
+Primary.args = {
+  howManyWindows: 1
+}
 
 export const OneUp = () => <Grid><Window id="a">A</Window></Grid>;
 export const TwoUp = () => <Grid><Window id="a">A</Window><Window id="b">B</Window></Grid>;
