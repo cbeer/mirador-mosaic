@@ -28,10 +28,8 @@ Primary.args = {
   howManyWindows: 1
 }
 
-export const OneUp = () => <Grid><Window id="a">A</Window></Grid>;
 export const TwoUp = () => <Grid><Window id="a">A</Window><Window id="b">B</Window></Grid>;
-export const ThreeUp = () => <Grid><Window id="a">A</Window><Window id="b">B</Window><Window id="c">C</Window></Grid>;
-export const InitialGrid = () => <Grid initialLayout={{ rows: [1, 1], columns: [1, 1], areas: [["a","a"], ["b", "c"]] }}><Window id="a">A</Window><Window id="b">B</Window><Window id="c">C</Window></Grid>;
+export const ProvidedGrid = () => <Grid initialLayout={{ rows: [1, 1], columns: [1, 1], areas: [["a","a"], ["b", "c"]] }}><Window id="a">A</Window><Window id="b">B</Window><Window id="c">C</Window></Grid>;
 export const ComplexGrid = () => (
   <Grid initialLayout={{ rows: [1, 1, 1, 1], columns: [1, 1, 1, 1, 1], areas: [["a", "a", "a", "a", "a"], ["d", "c", "f", "f", "f"], ["d", "c", "f", "f", "f"], ["d", "b", "e", "e", "e"]] }}>
     <Window id="a">A</Window>
