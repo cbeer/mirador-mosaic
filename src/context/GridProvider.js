@@ -110,44 +110,13 @@ const gridReducer = (state, action) => {
         id, value, dir, final,
       } = action;
       const { rows, columns } = state;
-      const bounds = operations.getBounds(state, id);
-
       if (value[dir] === 0) return state;
-      if (dir === 'right' && bounds.right === (columns.length - 1)) return state;
-      if (dir === 'left' && bounds.left === 0) return state;
-      if (dir === 'top' && bounds.top === 0) return state;
-      if (dir === 'bottom' && bounds.bottom === (rows.length - 1)) return state;
-
-      const blah = {
-        right: [0, 1],
-        left: [-1, 0],
-        top: [-1, 0],
-        bottom: [0, 1],
-      };
 
       const widthFrs = columns.reduce((a, b) => a + b, 0);
       const heightFrs = rows.reduce((a, b) => a + b, 0);
 
-      let result;
       const size = (dir === 'right' || dir === 'left') ? value[dir] * widthFrs : value[dir] * heightFrs;
-
-      if (dir === 'right' || dir === 'left') {
-        const [colToDuplicate, colToStealSizeFrom] = size > 0 ? blah[dir] : blah[dir].reverse();
-        const colToUpdate = bounds[dir] + colToStealSizeFrom + (colToDuplicate <= colToStealSizeFrom ? 1 : 0);
-
-        result = operations.resizeColumn(
-          operations.insertColumn(state, bounds[dir] + colToDuplicate, Math.abs(size), { source: id }),
-          (v, i) => (i === colToUpdate ? Math.max(0, v - Math.abs(size)) : v),
-        );
-      } if (dir === 'top' || dir === 'bottom') {
-        const [rowToDuplicate, rowToStealSizeFrom] = size > 0 ? blah[dir] : blah[dir].reverse();
-        const rowToUpdate = bounds[dir] + rowToStealSizeFrom + (rowToDuplicate <= rowToStealSizeFrom ? 1 : 0);
-
-        result = operations.resizeRow(
-          operations.insertRow(state, bounds[dir] + rowToDuplicate, Math.abs(size), { source: id }),
-          (v, i) => (i === rowToUpdate ? Math.max(0, v - Math.abs(size)) : v),
-        );
-      }
+      const result = operations.resizeBox(state, id, dir, size);
 
       if (final && result) {
         return { ...operations.cleanupGrid(result), temporaryLayout: null };

@@ -418,3 +418,37 @@ export const filter = (grid, fn = () => {}) => (
     }),
   }
 );
+
+export const resizeBox = (grid, id, dir, size) => {
+  const { rows, columns } = grid;
+  const bounds = getBounds(grid, id);
+
+  if (dir === 'right' && bounds.right === (columns.length - 1)) return grid;
+  if (dir === 'left' && bounds.left === 0) return grid;
+  if (dir === 'top' && bounds.top === 0) return grid;
+  if (dir === 'bottom' && bounds.bottom === (rows.length - 1)) return grid;
+
+  const blah = {
+    right: [0, 1],
+    left: [-1, 0],
+    top: [-1, 0],
+    bottom: [0, 1],
+  };
+  const [toGrow, toShrink] = blah[dir];
+
+  const resize = (dir === 'right' || dir === 'left') ? resizeColumn : resizeRow;
+  return resize(
+    grid,
+    (v, i) => {
+      if (i === bounds[dir] + toShrink) {
+        return Math.max(0, v - size);
+      }
+
+      if (i === bounds[dir] + toGrow) {
+        return Math.max(0, v + size);
+      }
+
+      return v;
+    },
+  );
+};
