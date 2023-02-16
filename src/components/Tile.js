@@ -6,6 +6,7 @@ import DragHandles from './DragHandles';
 
 function Tile({
   children, id, onDropFailed = () => {}, gridArea = id,
+  targetStyle = {},
 }) {
   const [{ isDragging, opacity }, dragHandle, preview] = useDrag(() => ({
     type: 'mirador.window',
@@ -52,7 +53,7 @@ function Tile({
 
   return (
     <div ref={drop} style={tileStyle}>
-      <DropTargetContainer isOver={isOver} box={id} padding={4} />
+      <DropTargetContainer isOver={isOver} padding={4} targetStyle={targetStyle} />
 
       <div ref={preview} style={windowStyle}>
         {child}
@@ -68,6 +69,7 @@ Tile.propTypes = {
   id: PropTypes.string,
   onDropFailed: PropTypes.func,
   gridArea: PropTypes.string,
+  targetStyle: PropTypes.object,
 };
 
 export default Tile;

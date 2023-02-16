@@ -8,7 +8,7 @@ import { useDrop } from 'react-dnd';
  * @private
  */
 function DropTarget({
-  box, dir = 'left', size = '30%', style = {}, ...props
+  dir = 'left', size = '30%', style = {}, ...props
 }) {
   const [{ dropAreaStyles }, drop] = useDrop(
     () => ({
@@ -18,8 +18,7 @@ function DropTarget({
       },
       collect: (monitor) => ({
         dropAreaStyles: (
-          monitor.getItem()?.id !== box
-            && monitor.isOver()
+          monitor.isOver()
             && monitor.canDrop() ? { backgroundColor: 'rgba(0,0,0,0.3)', border: '2px solid #000' } : {}
         ),
       }),
@@ -46,7 +45,6 @@ function DropTarget({
 }
 
 DropTarget.propTypes = {
-  box: PropTypes.string,
   dir: PropTypes.string,
   size: PropTypes.string,
   style: PropTypes.object,
@@ -57,7 +55,7 @@ DropTarget.propTypes = {
  * within a window.
  */
 function DropTargetContainer({
-  isOver = false, padding = 0, size = '30%', style, ...props
+  isOver = false, padding = 0, size = '30%', style, targetStyle, ...props
 }) {
   return (
     <div
@@ -66,10 +64,10 @@ function DropTargetContainer({
       }}
       {...props}
     >
-      <DropTarget dir="top" size={size} style={{ zIndex: isOver ? 1 : undefined }} />
-      <DropTarget dir="bottom" size={size} style={{ zIndex: isOver ? 1 : undefined }} />
-      <DropTarget dir="left" size={size} style={{ zIndex: isOver ? 1 : undefined }} />
-      <DropTarget dir="right" size={size} style={{ zIndex: isOver ? 1 : undefined }} />
+      <DropTarget dir="top" size={size} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
+      <DropTarget dir="bottom" size={size} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
+      <DropTarget dir="left" size={size} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
+      <DropTarget dir="right" size={size} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
     </div>
   );
 }
@@ -79,6 +77,7 @@ DropTargetContainer.propTypes = {
   padding: PropTypes.number,
   size: PropTypes.string,
   style: PropTypes.object,
+  targetStyle: PropTypes.object,
 };
 
 export default DropTargetContainer;

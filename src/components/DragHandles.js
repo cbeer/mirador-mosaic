@@ -126,35 +126,55 @@ DragHandle.propTypes = {
   style: PropTypes.object,
 };
 
-export default function DragHandles({ size = 5, ...props }) {
+export default function DragHandles({ size = 5, style = {}, ...props }) {
   return (
     <>
       <DragHandle
         {...props}
         dir="left"
         style={{
-          left: -1 * Math.floor(size / 2), width: size, top: 0, bottom: 0, cursor: 'ew-resize',
+          ...style,
+          left: -1 * Math.floor(size / 2),
+          width: size,
+          top: 0,
+          bottom: 0,
+          cursor: 'ew-resize',
         }}
       />
       <DragHandle
         {...props}
         dir="top"
         style={{
-          top: -1 * Math.floor(size / 2), height: size, left: 0, right: 0, cursor: 'ns-resize',
+          ...style,
+          top: -1 * Math.floor(size / 2),
+          height: size,
+          left: 0,
+          right: 0,
+          cursor: 'ns-resize',
         }}
       />
       <DragHandle
         {...props}
         dir="right"
         style={{
-          right: -1 * Math.floor(size / 2), width: size, top: 0, bottom: 0, cursor: 'ew-resize',
+          ...style,
+          right: -1 * Math.floor(size / 2),
+          width: size,
+          top: 0,
+          bottom: 0,
+          cursor: 'ew-resize',
         }}
       />
       <DragHandle
         {...props}
         dir="bottom"
         style={{
-          bottom: -1 * Math.floor(size / 2), height: size, left: 0, right: 0, cursor: 'ns-resize',
+          ...style,
+          bottom: -1 * Math.floor(size / 2),
+          height: size,
+          left: 0,
+          right: 0,
+          cursor: 'ns-resize',
         }}
       />
     </>
@@ -164,4 +184,5 @@ export default function DragHandles({ size = 5, ...props }) {
 DragHandles.propTypes = {
   box: PropTypes.string,
   size: PropTypes.number,
+  style: PropTypes.object,
 };
