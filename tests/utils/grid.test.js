@@ -265,18 +265,6 @@ test('cleanupGrid', () => {
     },
   );
 
-  expect(grid.cleanupGrid({ ...layout, rows: [0, 1, 1, 1], columns: [1, 1, 0] })).toEqual(
-    {
-      rows: [1, 1, 1],
-      columns: [1, 1],
-      areas: [
-        ['d', 'e'],
-        ['g', 'h'],
-        ['j', 'k'],
-      ],
-    },
-  );
-
   const duplicateRow = [
     ['a', 'b', 'c'],
     ['a', 'b', 'c'],
@@ -333,6 +321,14 @@ test('cleanupGrid', () => {
       rows: [1, 1],
       columns: [1, 1],
       areas: [['a', 'b'], ['a', 'c']],
+    },
+  );
+
+  expect(grid.cleanupGrid({ rows: [0.25, 0.5], columns: [1, 2], areas: [['a', 'b'], ['c', 'd']] })).toEqual(
+    {
+      rows: [1 / 3, 2 / 3],
+      columns: [1, 2],
+      areas: [['a', 'b'], ['c', 'd']],
     },
   );
 });

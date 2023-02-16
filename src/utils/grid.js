@@ -207,6 +207,22 @@ const iterativeBinPacking = (grid) => {
   return Array(iterations).fill(0).reduce((g) => attemptBinPacking(g), grid);
 };
 
+const rescaleGrid = ({ rows, columns, ...other }) => {
+  const rowSum = rows.reduce((a, b) => a + b, 0);
+  const colSum = columns.reduce((a, b) => a + b, 0);
+
+  if (rowSum >= 1 && colSum >= 1) return { rows, columns, ...other };
+
+  const rowScale = rowSum < 1 ? 1 / rowSum : 1;
+  const colScale = colSum < 1 ? 1 / colSum : 1;
+
+  return {
+    rows: rows.map((r) => r * rowScale),
+    columns: columns.map((c) => c * colScale),
+    ...other,
+  };
+};
+
 export const cleanupGrid = (grid) => {
   const steps = [
     removeEmptyGridRowCols,
@@ -215,6 +231,7 @@ export const cleanupGrid = (grid) => {
     cleanupPlaceholderColumns,
     cleanupPlaceholderRows,
     iterativeBinPacking,
+    rescaleGrid,
   ];
 
   return steps.reduce((g, step) => step(g) || grid, grid);
