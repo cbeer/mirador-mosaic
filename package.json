@@ -4,6 +4,7 @@
   "sourceType": "module",
   "source": "src/mirador-mosaic.js",
   "homepage": "https://cbeer.github.io/mirador-mosaic",
+  "license": "Apache-2.0",
   "exports": {
     "require": "./dist/mirador-mosaic.cjs",
     "default": "./dist/mirador-mosaic.modern.js"
