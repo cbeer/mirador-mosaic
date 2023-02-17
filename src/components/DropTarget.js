@@ -8,15 +8,16 @@ import { useDrop } from 'react-dnd';
  * @private
  */
 function DropTarget({
-  dir = 'left', size = '30%', style = {}, ...props
+  dir = 'left', size = '30%', hoverSize = '50%', style = {}, ...props
 }) {
-  const [{ dropAreaStyles }, drop] = useDrop(
+  const [{ dropAreaStyles, isOver }, drop] = useDrop(
     () => ({
       accept: 'mirador.window',
       drop() {
         return { dir };
       },
       collect: (monitor) => ({
+        isOver: monitor.isOver(),
         dropAreaStyles: (
           monitor.isOver()
             && monitor.canDrop() ? { backgroundColor: 'rgba(0,0,0,0.3)', border: '2px solid #000' } : {}
@@ -27,10 +28,10 @@ function DropTarget({
   );
 
   const position = {
-    top: { bottom: `calc(100% - ${size})` },
-    bottom: { top: `calc(100% - ${size})` },
-    left: { right: `calc(100% - ${size})` },
-    right: { left: `calc(100% - ${size})` },
+    top: { bottom: `calc(100% - ${isOver ? hoverSize : size})` },
+    bottom: { top: `calc(100% - ${isOver ? hoverSize : size})` },
+    left: { right: `calc(100% - ${isOver ? hoverSize : size})` },
+    right: { left: `calc(100% - ${isOver ? hoverSize : size})` },
   };
 
   return (
@@ -46,6 +47,7 @@ function DropTarget({
 
 DropTarget.propTypes = {
   dir: PropTypes.string,
+  hoverSize: PropTypes.string,
   size: PropTypes.string,
   style: PropTypes.object,
 };
@@ -55,7 +57,7 @@ DropTarget.propTypes = {
  * within a window.
  */
 function DropTargetContainer({
-  isOver = false, padding = 0, size = '30%', style, targetStyle, ...props
+  isOver = false, padding = 0, size = '30%', hoverSize = '50%', style, targetStyle, ...props
 }) {
   return (
     <div
@@ -64,16 +66,17 @@ function DropTargetContainer({
       }}
       {...props}
     >
-      <DropTarget dir="top" size={size} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
-      <DropTarget dir="bottom" size={size} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
-      <DropTarget dir="left" size={size} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
-      <DropTarget dir="right" size={size} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
+      <DropTarget dir="top" size={size} hoverSize={hoverSize} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
+      <DropTarget dir="bottom" size={size} hoverSize={hoverSize} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
+      <DropTarget dir="left" size={size} hoverSize={hoverSize} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
+      <DropTarget dir="right" size={size} hoverSize={hoverSize} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
     </div>
   );
 }
 
 DropTargetContainer.propTypes = {
   isOver: PropTypes.bool,
+  hoverSize: PropTypes.string,
   padding: PropTypes.number,
   size: PropTypes.string,
   style: PropTypes.object,

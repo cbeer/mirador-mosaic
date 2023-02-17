@@ -108,7 +108,7 @@ function Container({
 
   return (
     <div ref={mergeRefs(ref, windowDrop, borderDrop)} style={gridStyle} {...props}>
-      <DropTargetContainer isOver={isOver} box="root" size="25px" />
+      <DropTargetContainer isOver={isOver} box="root" size="25px" hoverSize="30%" />
       {Children.map(children, (child) => <Tile id={child.props.id} onDropFailed={onDropFailed}>{child}</Tile>)}
     </div>
   );
