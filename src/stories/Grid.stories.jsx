@@ -29,6 +29,7 @@ Primary.args = {
 }
 
 export const TwoUp = () => <Grid><Window id="a">A</Window><Window id="b">B</Window></Grid>;
+export const ThreeByTwo = () => <Grid initialLayout={{ rows: [1, 1], columns: [1, 1, 1], areas: [["a", "b", "b"], ["c", "d", "e"]] }}><Window id="a">A</Window><Window id="b">B</Window><Window id="c">C</Window><Window id="d">D</Window><Window id="e">E</Window></Grid>;
 export const ProvidedGrid = () => <Grid initialLayout={{ rows: [1, 1], columns: [1, 1], areas: [["a","a"], ["b", "c"]] }}><Window id="a">A</Window><Window id="b">B</Window><Window id="c">C</Window></Grid>;
 export const ComplexGrid = () => (
   <Grid initialLayout={{ rows: [1, 1, 1, 1], columns: [1, 1, 1, 1, 1], areas: [["a", "a", "a", "a", "a"], ["d", "c", "f", "f", "f"], ["d", "c", "f", "f", "f"], ["d", "b", "e", "e", "e"]] }}>
