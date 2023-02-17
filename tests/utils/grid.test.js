@@ -16,8 +16,8 @@ test('getBounds', () => {
     {
       top: 0,
       left: 0,
-      right: 1,
-      bottom: 0,
+      right: 2,
+      bottom: 1,
     },
   );
 
@@ -25,8 +25,8 @@ test('getBounds', () => {
     {
       top: 0,
       left: 2,
-      right: 2,
-      bottom: 0,
+      right: 3,
+      bottom: 1,
     },
   );
 
@@ -34,8 +34,8 @@ test('getBounds', () => {
     {
       top: 1,
       left: 2,
-      right: 2,
-      bottom: 1,
+      right: 3,
+      bottom: 2,
     },
   );
 });

@@ -374,10 +374,10 @@ export const getBounds = ({ areas }, id) => {
   const row = areas.find((r) => r.includes(id)) || [];
 
   return {
-    right: row.lastIndexOf(id),
+    right: row.lastIndexOf(id) + 1,
     left: row.indexOf(id),
     top: areas.findIndex((r) => r.includes(id)),
-    bottom: areas.findLastIndex((r) => r.includes(id)),
+    bottom: areas.findLastIndex((r) => r.includes(id)) + 1,
   };
 };
 
@@ -423,28 +423,20 @@ export const resizeBox = (grid, id, dir, size) => {
   const { rows, columns } = grid;
   const bounds = getBounds(grid, id);
 
-  if (dir === 'right' && bounds.right === (columns.length - 1)) return grid;
+  if (dir === 'right' && bounds.right === columns.length) return grid;
   if (dir === 'left' && bounds.left === 0) return grid;
   if (dir === 'top' && bounds.top === 0) return grid;
-  if (dir === 'bottom' && bounds.bottom === (rows.length - 1)) return grid;
-
-  const blah = {
-    right: [0, 1],
-    left: [-1, 0],
-    top: [-1, 0],
-    bottom: [0, 1],
-  };
-  const [toGrow, toShrink] = blah[dir];
+  if (dir === 'bottom' && bounds.bottom === rows.length) return grid;
 
   const resize = (dir === 'right' || dir === 'left') ? resizeColumn : resizeRow;
   return resize(
     grid,
     (v, i) => {
-      if (i === bounds[dir] + toShrink) {
+      if (i === bounds[dir]) {
         return Math.max(0, v - size);
       }
 
-      if (i === bounds[dir] + toGrow) {
+      if (i === bounds[dir] - 1) {
         return Math.max(0, v + size);
       }
 

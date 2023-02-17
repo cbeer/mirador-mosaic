@@ -47,7 +47,7 @@ const gridReducer = (state, action) => {
       if (box === 'root') {
         const { rows, columns } = state;
         const bounds = operations.getBounds(state, id);
-        const newSize = dir === 'right' || dir === 'left' ? 1 + bounds.right - bounds.left : 1 + bounds.bottom - bounds.top;
+        const newSize = dir === 'right' || dir === 'left' ? bounds.right - bounds.left : bounds.bottom - bounds.top;
 
         const { areas: newAreas } = operations.removeBox(state, id);
 
@@ -67,8 +67,9 @@ const gridReducer = (state, action) => {
         } = operations.getBounds(state, box);
         const first = dir === 'left' || dir === 'right' ? left : top;
         const last = dir === 'left' || dir === 'right' ? right : bottom;
-        const { rows, columns, areas } = ((last - first) % 2 === 0) ? split(state, first + (last - first) / 2) : state;
-        const midpoint = Math.ceil((first + last + (((last - first) % 2 === 0) ? 1 : 0)) / 2);
+
+        const { rows, columns, areas } = ((last - first) % 2 === 1) ? split(state, Math.floor(first + (last - first) / 2)) : state;
+        const midpoint = Math.floor((first + last + (((last - first) % 2 === 1) ? 1 : 0)) / 2);
         // split the current column and divide it before/after
         const newAreas = areas.map((data, row) => {
           const adjRow = data.map((v, col) => {

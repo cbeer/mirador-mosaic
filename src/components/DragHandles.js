@@ -22,9 +22,9 @@ function DragHandle({
   const { rows, columns } = grid;
 
   if (dir === 'top' && bounds.top === 0) return null;
-  if (dir === 'bottom' && bounds.bottom === rows.length - 1) return null;
+  if (dir === 'bottom' && bounds.bottom === rows.length) return null;
   if (dir === 'left' && bounds.left === 0) return null;
-  if (dir === 'right' && bounds.right === columns.length - 1) return null;
+  if (dir === 'right' && bounds.right === columns.length) return null;
 
   const handleStyles = {
     backgroundColor: 'rgba(0,0,0,0.5)',
