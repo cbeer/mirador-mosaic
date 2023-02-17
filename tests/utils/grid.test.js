@@ -324,9 +324,19 @@ test('cleanupGrid', () => {
     },
   );
 
+  expect(grid.cleanupGrid({
+    rows: [1, 1, 1], columns: [1, 1, 1, 1], areas: [['a', 'a', 'b', 'b'], ['c', 'c', 'c', 'd'], ['.', 'e', 'e', 'f']], dir: 'right',
+  })).toEqual(
+    {
+      rows: [1, 1, 1],
+      columns: [1, 1, 1, 1],
+      areas: [['a', 'a', 'b', 'b'], ['c', 'c', 'c', 'd'], ['e', 'e', 'e', 'f']],
+    },
+  );
+
   expect(grid.cleanupGrid({ rows: [0.25, 0.5], columns: [1, 2], areas: [['a', 'b'], ['c', 'd']] })).toEqual(
     {
-      rows: [1 / 3, 2 / 3],
+      rows: [0.5, 1],
       columns: [1, 2],
       areas: [['a', 'b'], ['c', 'd']],
     },

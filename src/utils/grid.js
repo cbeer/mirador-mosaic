@@ -129,8 +129,8 @@ const calculateSpans = (areas) => {
 
       obj.top = Math.min(obj.top, i);
       obj.left = Math.min(obj.left, j);
-      obj.bottom = Math.max(obj.bottom, i);
-      obj.right = Math.max(obj.right, j);
+      obj.bottom = Math.max(obj.bottom, i + 1);
+      obj.right = Math.max(obj.right, j + 1);
     });
   });
 
@@ -208,13 +208,14 @@ const iterativeBinPacking = (grid) => {
 };
 
 const rescaleGrid = ({ rows, columns, ...other }) => {
-  const rowSum = rows.reduce((a, b) => a + b, 0);
-  const colSum = columns.reduce((a, b) => a + b, 0);
+  const rowMax = Math.max.apply(null, rows);
+  const colMax = Math.max.apply(null, columns);
 
-  if (rowSum >= 1 && colSum >= 1) return { rows, columns, ...other };
+  // if (rowSum >= 1 && colSum >= 1) return { rows, columns, ...other };
+  if (rowMax >= 1 && colMax >= 1) return { rows, columns, ...other };
 
-  const rowScale = rowSum < 1 ? 1 / rowSum : 1;
-  const colScale = colSum < 1 ? 1 / colSum : 1;
+  const rowScale = rowMax < 1 ? 1 / rowMax : 1;
+  const colScale = colMax < 1 ? 1 / colMax : 1;
 
   return {
     rows: rows.map((r) => r * rowScale),
@@ -325,7 +326,7 @@ export const splitColumn = ({
 }, index) => ({
   rows,
   columns: [...columns.slice(0, index), columns[index] / 2, columns[index] / 2, ...columns.slice(index + 1)],
-  areas: areas.map((row) => [...row.slice(0, index), row[index], ...row.slice(index)]),
+  areas: areas.map((row) => [...row.slice(0, index), row[index], row[index], ...row.slice(index + 1)]),
   ...other,
 });
 
@@ -419,8 +420,35 @@ export const filter = (grid, fn = () => {}) => (
   }
 );
 
+const fillAreas = ({ areas, ...other }, fn) => (
+  {
+    ...other,
+    areas: areas.map((row, i) => (row.map((v, j) => fn(areas, i, j, v)))),
+  }
+);
+
+const resize = (grid, index, dir, size) => {
+  // just resize the column as-is
+  const fn = (dir === 'right' || dir === 'left') ? resizeColumn : resizeRow;
+  return fn(
+    grid,
+    (v, i) => {
+      if (i === index) {
+        return Math.max(0, v - size);
+      }
+
+      if (i === index - 1) {
+        return Math.max(0, v + size);
+      }
+
+      return v;
+    },
+  );
+};
+
 export const resizeBox = (grid, id, dir, size) => {
-  const { rows, columns } = grid;
+  const { areas, rows, columns } = grid;
+  const spans = calculateSpans(areas);
   const bounds = getBounds(grid, id);
 
   if (dir === 'right' && bounds.right === columns.length) return grid;
@@ -428,19 +456,106 @@ export const resizeBox = (grid, id, dir, size) => {
   if (dir === 'top' && bounds.top === 0) return grid;
   if (dir === 'bottom' && bounds.bottom === rows.length) return grid;
 
-  const resize = (dir === 'right' || dir === 'left') ? resizeColumn : resizeRow;
-  return resize(
-    grid,
-    (v, i) => {
-      if (i === bounds[dir]) {
-        return Math.max(0, v - size);
-      }
+  // figure out how many columns over we've been dragged
+  // split the column we're in in half
+  // duplicating the current column, except for the current box
 
-      if (i === bounds[dir] - 1) {
-        return Math.max(0, v + size);
-      }
+  if (dir === 'top') {
+    // check the bounds of the box(es) above and make sure they don't
+    // excede this box's bounds.
 
-      return v;
-    },
-  );
+    const upperLeft = spans.get(areas[bounds.top - 1][bounds.left]);
+    const upperRight = spans.get(areas[bounds.top - 1][bounds.right - 1]);
+
+    if (upperLeft.left < bounds.left || upperRight.right > bounds.right) {
+      return resize(grid, bounds.top, dir, size);
+    }
+  } else if (dir === 'bottom') {
+    // check the bounds of the box(es) below and make sure they don't
+    // excede this box's bounds.
+
+    const bottomLeft = spans.get(areas[bounds.bottom][bounds.left]);
+    const bottomRight = spans.get(areas[bounds.bottom][bounds.right - 1]);
+
+    if (bottomLeft.left < bounds.left || bottomRight.right > bounds.right) {
+      return resize(grid, bounds.bottom, dir, size);
+    }
+  } else if (dir === 'left') {
+    const upperLeft = spans.get(areas[bounds.top][bounds.left - 1]);
+    const bottomLeft = spans.get(areas[bounds.bottom - 1][bounds.left - 1]);
+
+    if (upperLeft.top < bounds.top || bottomLeft.bottom > bounds.bottom) {
+      return resize(grid, bounds.left, dir, size);
+    }
+  } else if (dir === 'right') {
+    const upperRight = spans.get(areas[bounds.top][bounds.right]);
+    const bottomRight = spans.get(areas[bounds.bottom - 1][bounds.right]);
+
+    if (upperRight.top < bounds.top || bottomRight.bottom > bounds.bottom) {
+      return resize(grid, bounds.right, dir, size);
+    }
+  }
+
+  if (dir === 'left' || dir === 'right') {
+    const offset = 0;
+    const columnToSplit = bounds[dir] + (size > 0 ? 0 : -1);
+    const steps = [
+      [splitColumn, columnToSplit],
+      [
+        resizeColumn, (v, i) => {
+          if (i === bounds[dir]) {
+            return Math.max(0, Math.abs(size) - offset);
+          }
+
+          if (size < 0 && i === bounds[dir] - 1) {
+            return Math.max(0, columns[bounds[dir] - 1] - (Math.abs(size) - offset));
+          }
+
+          if (size > 0 && i === bounds[dir] + 1) {
+            return Math.max(0, columns[bounds[dir]] - (Math.abs(size) - offset));
+          }
+
+          return v;
+        },
+      ],
+      [fillAreas, (a, i, j, v) => (i >= bounds.top && i < bounds.bottom && j === bounds[dir] ? a[i][j + (size > 0 ? -1 : 1)] : v)],
+      [rescaleGrid],
+    ];
+
+    const result = steps.reduce((g, [fn, ...args]) => fn(g, ...args), grid);
+    return result;
+  }
+
+  if (dir === 'top' || dir === 'bottom') {
+    const offset = 0;
+    const rowToSplit = bounds[dir] + (size > 0 ? 0 : -1);
+
+    const steps = [
+      [splitRow, rowToSplit],
+      [
+        resizeRow, (v, i) => {
+          if (i === bounds[dir]) {
+            return Math.max(0, Math.abs(size) - offset);
+          }
+
+          if (size < 0 && i === bounds[dir] - 1) {
+            return Math.max(0, rows[bounds[dir] - 1] - (Math.abs(size) - offset));
+          }
+
+          if (size > 0 && i === bounds[dir] + 1) {
+            return Math.max(0, rows[bounds[dir]] - (Math.abs(size) - offset));
+          }
+
+          return v;
+        },
+      ],
+      [fillAreas, (a, i, j, v) => (j >= bounds.left && j < bounds.right && i === bounds[dir] ? a[i + (size > 0 ? -1 : 1)][j] : v)],
+      [rescaleGrid],
+    ];
+
+    const result = steps.reduce((g, [fn, ...args]) => fn(g, ...args), grid);
+    return result;
+  }
+
+  return grid;
 };
