@@ -12,7 +12,7 @@ import { GridContext, GridDispatchContext, GridProvider } from '../context/GridP
 
 const calculateGridStyles = (gridTemplate) => ({
   gridTemplateRows: (gridTemplate.rows.map((row) => `${row}fr`)).join(' '),
-  gridTemplateColumns: gridTemplate.columns.map((col) => `minmax(max-content, ${col}fr)`).join(' '),
+  gridTemplateColumns: gridTemplate.columns.map((col) => `minmax(20px, ${col}fr)`).join(' '),
   gridTemplateAreas: gridTemplate.areas.map((row) => `"${row.join(' ')}"`).join('\n'),
   gridAutoRows: '0px',
 });
