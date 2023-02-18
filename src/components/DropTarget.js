@@ -66,10 +66,10 @@ function DropTargetContainer({
       }}
       {...props}
     >
-      <DropTarget dir="top" size={size} hoverSize={hoverSize} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
-      <DropTarget dir="bottom" size={size} hoverSize={hoverSize} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
-      <DropTarget dir="left" size={size} hoverSize={hoverSize} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
-      <DropTarget dir="right" size={size} hoverSize={hoverSize} style={{ ...targetStyle, zIndex: isOver ? 1 : undefined }} />
+      <DropTarget dir="top" size={size} hoverSize={hoverSize} style={{ ...targetStyle, zIndex: isOver ? 9998 : undefined }} />
+      <DropTarget dir="bottom" size={size} hoverSize={hoverSize} style={{ ...targetStyle, zIndex: isOver ? 9998 : undefined }} />
+      <DropTarget dir="left" size={size} hoverSize={hoverSize} style={{ ...targetStyle, zIndex: isOver ? 9998 : undefined }} />
+      <DropTarget dir="right" size={size} hoverSize={hoverSize} style={{ ...targetStyle, zIndex: isOver ? 9998 : undefined }} />
     </div>
   );
 }
