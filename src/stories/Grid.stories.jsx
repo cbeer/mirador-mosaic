@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Grid, GridDispatchContext, gridUtils } from '../mirador-mosaic';
+import { Grid, GridDispatchContext, gridUtils } from '../index';
 
 export default {
   title: 'Grid',
