@@ -1,5 +1,5 @@
 import {
-  Children, useCallback, useLayoutEffect, useState, useRef, useContext,
+  Children, useCallback, useRef, useContext, useReducer, useMemo, useEffect,
 } from 'react';
 import PropTypes from 'prop-types';
 import { DndProvider } from 'react-dnd-multi-backend';
@@ -9,6 +9,7 @@ import mergeRefs from '../utils/mergeRefs';
 import DropTargetContainer from './DropTarget';
 import Tile from './Tile';
 import { GridContext, GridDispatchContext, GridProvider } from '../context/GridProvider';
+import gridReducer from '../reducers';
 
 const calculateGridStyles = (gridTemplate) => ({
   gridTemplateRows: (gridTemplate.rows.map((row) => `${row}fr`)).join(' '),
@@ -17,18 +18,25 @@ const calculateGridStyles = (gridTemplate) => ({
   gridAutoRows: '0px',
 });
 
-function Container({
+export function Container({
   children, style, ...props
 }) {
   const ref = useRef(null);
+
   const gridTemplate = useContext(GridContext);
-  const { temporaryLayout } = gridTemplate;
   const dispatch = useContext(GridDispatchContext);
 
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
+  // we use interally managed state for "temporary" layout while
+  // the user is e.g. actively resizing the window. This is especially
+  // important if the context state is managed through e.g. redux.
+  const [temporaryLayoutData, dispatchTemporaryLayout] = useReducer(gridReducer, gridTemplate);
 
-  const gridStyle = {
+  // when the gridTemplate changes, keep the temporary layout in sync
+  useEffect(() => {
+    dispatchTemporaryLayout({ type: 'set', layout: gridTemplate })
+  }, [gridTemplate]);
+
+  const gridStyle = useMemo(() => ({
     position: 'absolute',
     inset: 0,
     display: 'grid',
@@ -36,11 +44,15 @@ function Container({
     justifyItems: 'stretch',
     alignItems: 'stretch',
     ...style,
-    ...calculateGridStyles(temporaryLayout || gridTemplate),
-  };
+    ...(calculateGridStyles(temporaryLayoutData.temporaryLayout || gridTemplate)),
+  }), [temporaryLayoutData, gridTemplate]);
 
   const resizeWindow = useCallback((item, diff, final) => {
-    dispatch({
+    const cb = final ? dispatch : dispatchTemporaryLayout;
+
+    const { width, height } = ref.current?.getBoundingClientRect() || { width: Infinity, height: Infinity };
+
+    cb({
       final,
       type: 'resize',
       id: item.box,
@@ -52,7 +64,7 @@ function Container({
         right: item.dir === 'right' ? diff.x / width : 0,
       },
     });
-  }, [dispatch, width, height]);
+  }, [dispatch, dispatchTemporaryLayout, ref]);
 
   const [, borderDrop] = useDrop(
     () => ({
@@ -71,40 +83,32 @@ function Container({
     [resizeWindow],
   );
 
+  const onDropFailed = useCallback(() => {
+    dispatchTemporaryLayout({ type: 'end_drag' });
+  }, [dispatchTemporaryLayout]);
+
   const [{ isOver }, windowDrop] = useDrop(() => ({
     accept: 'mirador.window',
     drop(item, monitor) {
       const result = monitor.getDropResult();
-      if (result) {
-        dispatch({
-          type: 'drop',
-          id: item.id,
-          box: result.box,
-          dir: result.dir,
-        });
-      } else {
-        dispatch({ type: 'end_drag' });
-      }
+      if (!result) return onDropFailed();
+
+      dispatch({
+        type: 'drop',
+        id: item.id,
+        box: result.box,
+        dir: result.dir,
+      });
+
       return undefined;
     },
     hover({ id }) {
-      dispatch({ type: 'start_drag', id });
+      dispatchTemporaryLayout({ type: 'move', id });
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
-  }), [dispatch]);
-
-  const onDropFailed = useCallback(() => {
-    dispatch({ type: 'end_drag' });
-  }, [dispatch]);
-
-  useLayoutEffect(() => {
-    if (!ref.current) return;
-
-    setWidth(ref.current.getBoundingClientRect().width);
-    setHeight(ref.current.getBoundingClientRect().height);
-  }, []);
+  }), [dispatch, dispatchTemporaryLayout]);
 
   return (
     <div ref={mergeRefs(ref, windowDrop, borderDrop)} style={gridStyle} {...props}>
